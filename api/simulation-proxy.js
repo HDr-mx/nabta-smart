@@ -1,7 +1,10 @@
-const upstreamOrigin = 'https://nabta-smart.haydardouraid2006.chatgpt.site';
+const upstreamOrigin = process.env.SIMULATION_UPSTREAM_ORIGIN;
 
 module.exports = async function simulationProxy(req, res) {
   res.setHeader('Cache-Control', 'no-store');
+  if (!upstreamOrigin) {
+    return res.status(503).json({ error: 'Simulation service is not configured' });
+  }
   if (!['GET', 'POST'].includes(req.method)) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
