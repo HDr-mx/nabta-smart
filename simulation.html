@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>محاكاة نبتة سمارت</title>
+<style>
+:root{color-scheme:dark;--bg:#071d16;--card:#103d2d;--line:#2f7b5c;--mint:#65f29d;--soft:#c7e8d4;--text:#ffffff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 85% 0,#145b40 0,transparent 38%),linear-gradient(155deg,#071d16 0,#0b2b21 100%);color:var(--text);font:17px/1.65 system-ui,sans-serif;min-height:100vh}main{width:min(850px,100% - 32px);margin:32px auto}header{display:flex;align-items:center;gap:14px;margin-bottom:24px}header img{border-radius:13px;width:54px;height:54px;box-shadow:0 0 28px rgba(101,242,157,.38)}header span{color:var(--soft);font-size:.9rem}h1,h2,p{margin:0 0 12px}h1{font-size:clamp(26px,5vw,43px);line-height:1.18;text-shadow:0 3px 18px rgba(0,0,0,.28)}h2{font-size:20px}.note{color:var(--soft);margin:12px 0 22px}.panel{padding:20px;border:1px solid var(--line);background:linear-gradient(145deg,rgba(18,69,51,.97),rgba(10,47,35,.97));border-radius:16px;margin-bottom:14px;box-shadow:0 12px 32px rgba(0,0,0,.2)}.metrics .panel:first-child{border-top:4px solid #28d77d}.metrics .panel:nth-child(2){border-top:4px solid #ffb332}.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.value{font-size:clamp(29px,6vw,53px);font-weight:800;line-height:1.2;color:#ffffff}.on{color:#65f29d;text-shadow:0 0 18px rgba(101,242,157,.35)}.off{color:#ffcf70}.panel button,a.action{box-shadow:0 6px 18px rgba(44,224,124,.18)}button,a.action{font:inherit;font-weight:800;border:0;border-radius:9px;padding:10px 14px;background:linear-gradient(135deg,#65f29d,#25cf73);color:#062116;cursor:pointer;text-decoration:none;display:inline-block}button.secondary{background:#0b2a20;border:1px solid #49a878;color:var(--text);box-shadow:none}button:disabled{opacity:.6;cursor:wait}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}.row label{display:grid;gap:5px}input{font:inherit}input[type=number],input[type=url]{color:var(--text);background:#061c15;border:1px solid #3e8e69;border-radius:8px;padding:8px}input[type=number]{width:100px}input[type=url]{flex:1;min-width:190px}input[type=range]{width:100%;accent-color:#45e58a}a{color:#65f29d}.small,time{font-size:.88rem;color:var(--soft)}.events{padding:0;list-style:none}.events li{border-top:1px solid var(--line);padding:9px 0}.alert{color:#ffcf70;min-height:30px;font-weight:700}.status{font-size:.9rem;color:var(--soft)}[hidden]{display:none!important}@media(max-width:480px){.metrics{gap:8px}.panel{padding:14px}main{margin-top:15px}}
+</style>
+</head>
+<body><main>
+<header><img src="/icon-192.png" alt=""><div><a href="/">نبتة سمارت</a><br><span>مختبر الري الذكي</span></div></header>
+<h1 id="heading">لوحة محاكاة الري</h1>
+<p class="note">محاكاة لقناة Arduino UNO واحدة. قراءات الحساس والمضخة افتراضية.</p>
+<div id="status" class="status" role="status"></div>
+<div id="notice" class="alert" role="status"></div>
+<section id="lobby" class="panel"><h2>اربط الجهاز الثاني</h2><p>أنشئ جلسة ثم افتح رابط النبتة على اللابتوب الثاني. خلي لوحة التحكم مفتوحة على الجهاز الأول.</p><button id="create">إنشاء جلسة محاكاة</button></section>
+<div id="live" hidden>
+<div class="metrics">
+<section class="panel"><h2>رطوبة التربة</h2><div id="moisture" class="value">—</div></section>
+<section class="panel"><h2>المضخة الافتراضية</h2><div id="pump" class="value">—</div><div id="safety" class="small"></div></section>
+</div>
+<section class="panel" id="plant" hidden>
+<h2>تحكم برطوبة تربة النبتة</h2><label for="slider">قراءة الحساس <output id="slider-value">55%</output></label>
+<input id="slider" type="range" min="0" max="100" value="55">
+<div class="row"><button id="send-reading" class="secondary" type="button">إرسال القراءة</button><span id="reading-status" class="small" role="status"></span></div>
+<p class="small">المضخة تبقى شغّالة لحد ما توصل القراءة إلى حد الإيقاف أو تتجاوزه.</p>
+</section>
+<section class="panel" id="controls" hidden>
+<h2>رابط شاشة النبتة</h2><div class="row"><input id="pair" type="url" readonly dir="ltr" aria-label="رابط شاشة النبتة"><button id="copy">نسخ الرابط</button></div>
+<p class="small">الرابط صالح 24 ساعة. افتحه على الجهاز الثاني لمشاركة نفس الجلسة.</p>
+<div class="row"><a class="action" id="open-plant" target="_blank" rel="noopener">فتح شاشة النبتة</a><button id="enable" class="secondary">تفعيل إشعارات المتصفح</button></div>
+</section>
+<section class="panel">
+<h2>حدود الري</h2><p id="thresholds"></p>
+<form id="config" class="row" hidden><label>تشغيل تحت (%)<input id="low" type="number" min="1" max="99" required></label><label>إيقاف عند (%)<input id="high" type="number" min="2" max="100" required></label><button>حفظ الحدود</button><button id="reset" class="secondary" type="button">إعادة تسليح المضخة</button></form>
+<p class="small">حد تشغيل متواصل 30 ثانية. بعدها تتوقف المضخة وتنتظر إعادة التسليح.</p>
+</section>
+<section class="panel"><h2>سجل التنبيهات</h2><ul id="events" class="events"></ul></section>
+</div>
+</main><script src="/simulation-ui.js?v=3" defer></script></body></html>

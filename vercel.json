@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "rewrites": [
+    {"source":"/api/simulation","destination":"/api/simulation-proxy"},
+    {"source":"/api/simulation/:room","destination":"/api/simulation-proxy?room=:room"}
+  ],
+  "headers":[{"source":"/sw.js","headers":[{"key":"Cache-Control","value":"no-cache"}]}]
+}
